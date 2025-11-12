@@ -1,9 +1,9 @@
 # RTOS Stopwatch System / RTOS Timer System
 
 
-ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑color LEDs, and push button. Built with FreeRTOS (tasks, queues, mutexes, ISR). Each completed “job” (timing run) is published to Azure IoT Hub and optionally appended to Google Sheets in near real time.
+ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑color LEDs, and push button. Built with FreeRTOS (tasks, queues, mutexes, ISR). Each completed “job” (timing run) is published to Google Sheets in near real time.
 
-Demo‑friendly: plug in, watch the OLED and LEDs, see events in Azure, and rows appear in a spreadsheet.
+Demo‑friendly: plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
 
 
 
@@ -25,10 +25,8 @@ https://github.com/user-attachments/assets/348b11ab-e361-4c2c-843f-c8441c5d8198
 - Software
   - Arduino IDE 2.x (or PlatformIO) with ESP32 board support
   - Libraries: Adafruit SSD1306, Adafruit GFX, PubSubClient
-  - Azure CLI (for monitoring): `az extension add -n azure-iot`
   - curl (for quick Google Apps Script test)
-- Accounts/Cloud
-  - Azure subscription + IoT Hub
+- Accounts
   - Google account (Google Sheets + Apps Script)
 
 ---
@@ -119,11 +117,9 @@ State machine (simplified):
 - Place these files in an Arduino sketch folder named like the main `.ino` (e.g., `rtos_stopwatch_iothub`):
   - `rtos_stopwatch_iothub.ino` (main firmware)
   - `azure_config.h` (Wi‑Fi + IoT Hub credentials)
-  - `azure_root_ca.h` (root CA PEM for your IoT Hub TLS)
 - Open the sketch in Arduino IDE.
 - Edit `azure_config.h` (Wi‑Fi SSID/PASS, IoT Hub host, deviceId, deviceKey).
-- Edit `azure_root_ca.h` (paste the correct root certificate PEM).
-- Optional (Google Sheets): ensure your `SHEETS_WEBHOOK_URL` and `SHEETS_TOKEN` are set in the `.ino`.
+- (Google Sheets): ensure your `SHEETS_WEBHOOK_URL` and `SHEETS_TOKEN` are set in the `.ino`.
 - Select the correct board/port and Upload.
 - Open Serial Monitor @ 115200 to observe Wi‑Fi/NTP/MQTT/Publish logs.
 
@@ -140,22 +136,12 @@ Main tuning points in `rtos_stopwatch_iothub.ino`:
   - `ULTRASONIC_SAMPLE_MS` (50), `NEAR_CONSEC_REQUIRED` (3), `FAR_CONSEC_REQUIRED` (3)
 - Google Sheets webhook:
   - `SHEETS_WEBHOOK_URL`, `SHEETS_TOKEN` (search for these constants)
-- Azure connectivity:
-  - `mqttClient.setBufferSize(1024)`, keep‑alive, socket timeouts
 
 `azure_config.h`:
 ```c
 #define WIFI_SSID      "YOUR_WIFI_SSID"
 #define WIFI_PASSWORD  "YOUR_WIFI_PASSWORD"
-#define IOT_HUB_HOST   "your-hub.azure-devices.net"
-#define DEVICE_ID      "your-device-id"
-#define DEVICE_KEY     "BASE64_DEVICE_PRIMARY_KEY"
-#define SAS_TTL_SECS   (60 * 60)
-#define IOTHUB_API_VERSION "2021-04-12"
 ```
-
-`azure_root_ca.h`:
-- Paste the appropriate root PEM (often DigiCert Global Root G2; some hubs still chain to Baltimore CyberTrust Root). You can include multiple certs concatenated.
 
 Advanced:
 - Persist job number across reboots (NVS/Preferences).
@@ -163,46 +149,7 @@ Advanced:
 
 ---
 
-## 7. Azure IoT hub setup
-
-1) Create IoT Hub and Device
-- Azure Portal → Create “IoT Hub”.
-- In the hub: IoT devices → Add device → Note `deviceId`. Copy the device primary key (base64 SharedAccessKey).
-
-2) Fill firmware configs
-- `azure_config.h`:
-  - `IOT_HUB_HOST`: e.g., `your-hub.azure-devices.net`
-  - `DEVICE_ID`: your device id
-  - `DEVICE_KEY`: device primary key (base64), not the entire connection string
-- `azure_root_ca.h`: paste root CA PEM.
-
-3) Time and network
-- Device relies on NTP; ensure internet access. Port 8883 (MQTT over TLS) must be open.
-
-4) Test
-- Upload and open Serial Monitor. You should see:
-  - Wi‑Fi connected
-  - NTP time sync
-  - “[Azure] MQTT connected”
-  - “[Azure] Publish OK” after a job completes
-- Monitor:
-  - 1. Open Azure IoT Hub and check messages.
-![azure iot hub](/images/azure_iot_hub.png)
-
-  - 2. Fetch the data using terminal
-  ```bash
-  az extension add -n azure-iot
-  az iot hub monitor-events -n <YOUR_HUB_NAME> -d <DEVICE_ID>
-  ```
-  ![termina](/images/azure_data_fetch.png)
-
-Troubleshooting MQTT:
-- rc = -2 (socket/TLS): fix root CA, ensure correct host, try `wifiClient.setInsecure()` only for diagnosis.
-- rc = 5 (unauthorized): check DEVICE_KEY, device exists/enabled, username format.
-
----
-
-## 8. Google Sheets setup and app script
+## 7. Google Sheets setup and app script
 1) Create a Google Sheet
 - Add header row: `jobNumber | startTime | endTime | durationMs | insertedAt`
 - Note the spreadsheet ID from the URL (`/d/<SPREADSHEET_ID>/`).
@@ -259,21 +206,20 @@ curl -X POST "WEB_APP_URL?token=YOUR_SECRET" \
 ![google sheet](/images/google_sheet_data.png)
 ---
 
-## 9. Demonstration
+## 8. Demonstration
 - Power the ESP32‑S3; open Serial Monitor (115200).
 - READY: GREEN ON, OLED shows `00:00:00`.
 - Bring an object within ~10 cm (debounced) → RUNNING:
   - GREEN OFF, YELLOW blinks ~10 Hz, stopwatch runs.
 - Trigger stop (object near again or press button) → PAUSED:
   - RED ON for `PAUSE_HOLD_MS` (default 10 s), display frozen, telemetry queued/sent.
-- Show cloud and sheet:
-  - Azure: `az iot hub monitor-events -n <hub> -d <device>` to view each job JSON.
+- Show on sheet:
   - Google Sheet: rows appear live (use Freeze header; optionally insert charts).
 - Repeat to accumulate rows for averages/charts.
 
 ---
 
-## 10. Troubleshooting
+## 9. Troubleshooting
 Hardware
 - Ultrasonic false triggers:
   - Keep wiring short; add decoupling (100 nF + 10 µF).
@@ -284,10 +230,9 @@ Hardware
   - Confirm I2C address (0x3C). If needed run an I2C scanner.
   - Check SDA/SCL pins and pull‑ups; verify 3.3 V power.
 
-Networking/Azure
+Networking
 - Wi‑Fi not connecting: SSID/PASS, 2.4 GHz band, antenna clearance, router distance.
 - NTP time not syncing: ensure internet access (UDP 123). SAS requires valid time.
-- MQTT rc = -2: TLS handshake failure; fix CA (`azure_root_ca.h`), host spelling, SNI, port 8883 open.
 - MQTT rc = 5: Unauthorized; verify `DEVICE_KEY` (base64 key only), device enabled.
 - SAS expiry: default 1 hour; device reconnects with fresh token as needed.
 
@@ -305,13 +250,6 @@ Google Sheets / Apps Script
 Performance/Robustness
 - If bursts occur, buffer messages in a queue (or NVS) and retry in a background task.
 - Consider replacing `client.setInsecure()` with proper CA pinning for public demos.
-
----
-
-## File structure (reference)
-- `rtos_stopwatch_iothub.ino` — main FreeRTOS firmware with Azure MQTT and optional Google Sheets send
-- `azure_config.h` — Wi‑Fi and IoT Hub credentials and settings
-- `azure_root_ca.h` — Root CA certificate(s) for IoT Hub TLS
 
 ---
 
