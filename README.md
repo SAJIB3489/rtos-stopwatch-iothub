@@ -1,4 +1,6 @@
 # RTOS Stopwatch System / RTOS Timer System
+
+
 ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑color LEDs, and push button. Built with FreeRTOS (tasks, queues, mutexes, ISR). Each completed “job” (timing run) is published to Azure IoT Hub and optionally appended to Google Sheets in near real time.
 
 Demo‑friendly: plug in, watch the OLED and LEDs, see events in Azure, and rows appear in a spreadsheet.
@@ -152,6 +154,7 @@ Advanced:
 ---
 
 ## 7. Azure IoT hub setup
+
 1) Create IoT Hub and Device
 - Azure Portal → Create “IoT Hub”.
 - In the hub: IoT devices → Add device → Note `deviceId`. Copy the device primary key (base64 SharedAccessKey).
@@ -173,10 +176,15 @@ Advanced:
   - “[Azure] MQTT connected”
   - “[Azure] Publish OK” after a job completes
 - Monitor:
+  - Open Azure IoT Hub and check messages.
+![azure iot hub](/images/azure_iot_hub.png)
+
+  - OR Fetch the data using terminal
   ```bash
   az extension add -n azure-iot
   az iot hub monitor-events -n <YOUR_HUB_NAME> -d <DEVICE_ID>
   ```
+  ![termina](/images/azure_data_fetch.png)
 
 Troubleshooting MQTT:
 - rc = -2 (socket/TLS): fix root CA, ensure correct host, try `wifiClient.setInsecure()` only for diagnosis.
@@ -238,6 +246,7 @@ curl -X POST "WEB_APP_URL?token=YOUR_SECRET" \
 ```
 - Expect: `{"status":"ok"}` and a new row in the sheet.
 
+![google sheet](/images/google_sheet_data.png)
 ---
 
 ## 9. Demonstration
