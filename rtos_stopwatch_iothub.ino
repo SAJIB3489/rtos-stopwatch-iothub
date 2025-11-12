@@ -37,9 +37,9 @@
 #include "azure_root_ca.h"
 
 // Add these webhook constants near your other #define constants (e.g., after the Azure config section)
-#include <HTTPClient.h> /*new*/
-const char* SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbw6KojmC1_1A7EqYO1T5qTt3Y9WoiYSaTVq17-M91BFmeDM_A2qseGJselLF3d7xwrEmw/exec"; // replace with your Web App URL /*new*/
-const char* SHEETS_TOKEN       = "hkdshfshfTUYSD7SAKSDAL8"; // must match EXPECTED_TOKEN in Apps Script /*new*/
+#include <HTTPClient.h> 
+const char* SHEETS_WEBHOOK_URL = "Web_App_URL"; // replace with your Web App URL
+const char* SHEETS_TOKEN       = "SHEETS_TOKEN"; // must match EXPECTED_TOKEN in Apps Script 
 
 // ==== OLED ====
 #define SCREEN_WIDTH 128
@@ -323,7 +323,7 @@ void taskManager(void* arg) {
             // Send to Azure queue (non-blocking best-effort)
             xQueueSend(azureQueue, &t, 0);
 
-                        // ---------- INSERT #3: send same job to Google Sheets (best-effort) new start----------
+                        // ---------- INSERT #3: send same job to Google Sheets (best-effort)----------
             {
               String startIso = iso8601(gCurrentJobStart);
               String endIso   = iso8601(endUtc);
@@ -333,7 +333,7 @@ void taskManager(void* arg) {
                 // optional: enqueue locally for retry or write to NVS
               }
             }
-            // -------------------------------end------------------------------------------------
+            // -------------------------------------------------------------------------------
 
             // Enter paused state (20s)
             gState = STATE_PAUSED;
@@ -736,7 +736,6 @@ static bool mqttPublishTelemetry(const Telemetry& t) {
   return ok;
 }
 
-//new start
 
 // Place this function after your helper functions (e.g., after iso8601(...) or mqttPublishTelemetry(...))
 

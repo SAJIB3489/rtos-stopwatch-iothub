@@ -1,16 +1,16 @@
 #pragma once
 
 // ====== Wi-Fi ======
-#define WIFI_SSID      "FINNISH_PROBLEM"
-#define WIFI_PASSWORD  "FINNISH_PROBLEM"
+#define WIFI_SSID      "SSID_Name"
+#define WIFI_PASSWORD  "Password"
 
 // ====== Azure IoT Hub ======
 // Hostname like: "your-hub.azure-devices.net"
-#define IOT_HUB_HOST   "SajibIoTHub.azure-devices.net"
+#define IOT_HUB_HOST   "Host_Name"
 // Device ID you created in IoT Hub
-#define DEVICE_ID      "SajibDevID"
+#define DEVICE_ID      "Device_ID"
 // Device key (primary key) from IoT Hub device; this is BASE64 string
-#define DEVICE_KEY     "ZXrKybmvOEkbzCTQ3YWnav9EZ5GnzKzLX6gufeWlNzk="
+#define DEVICE_KEY     ""
 
 // SAS token lifetime (seconds)
 #define SAS_TTL_SECS   (60 * 60) // 1 hour
