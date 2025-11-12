@@ -176,10 +176,10 @@ Advanced:
   - “[Azure] MQTT connected”
   - “[Azure] Publish OK” after a job completes
 - Monitor:
-  - Open Azure IoT Hub and check messages.
+  - 1. Open Azure IoT Hub and check messages.
 ![azure iot hub](/images/azure_iot_hub.png)
 
-  - OR Fetch the data using terminal
+  - 2. Fetch the data using terminal
   ```bash
   az extension add -n azure-iot
   az iot hub monitor-events -n <YOUR_HUB_NAME> -d <DEVICE_ID>
