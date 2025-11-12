@@ -87,6 +87,8 @@ Electrical notes:
   - Framework Arduino; add the above libraries to `lib_deps`.
 
 ---
+![diagram](/images/diagram.png)
+
 
 ## 4. RTOS Architecture and core task and synchronization
 Core tasks (priorities in parentheses; higher = higher priority):
