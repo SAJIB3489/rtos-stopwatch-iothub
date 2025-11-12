@@ -34,7 +34,6 @@
 #include <Adafruit_SSD1306.h>
 
 #include "azure_config.h"
-#include "azure_root_ca.h"
 
 // Add these webhook constants near your other #define constants (e.g., after the Azure config section)
 #include <HTTPClient.h> 
