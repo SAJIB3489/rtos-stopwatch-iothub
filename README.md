@@ -7,7 +7,6 @@ Demo‑friendly: plug in, watch the OLED and LEDs, see events, and rows appear i
 
 
 
-https://github.com/user-attachments/assets/348b11ab-e361-4c2c-843f-c8441c5d8198
 
 
 
