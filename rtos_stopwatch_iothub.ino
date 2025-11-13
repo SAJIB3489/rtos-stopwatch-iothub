@@ -33,7 +33,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-#include "azure_config.h"
+#include "wifi_config.h"
 
 // Add these webhook constants near your other #define constants (e.g., after the Azure config section)
 #include <HTTPClient.h> 
