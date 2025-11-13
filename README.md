@@ -247,6 +247,3 @@ Performance/Robustness
 - Consider replacing `client.setInsecure()` with proper CA pinning for public demos.
 
 ---
-
-## License
-Demo/educational use. Review licenses for third‑party libraries (Adafruit GFX/SSD1306, PubSubClient).
