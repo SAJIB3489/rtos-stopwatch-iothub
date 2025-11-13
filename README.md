@@ -116,9 +116,9 @@ State machine (simplified):
 ## 5. How to use (clone the project)
 - Place these files in an Arduino sketch folder named like the main `.ino` (e.g., `rtos_stopwatch_iothub`):
   - `rtos_stopwatch_iothub.ino` (main firmware)
-  - `azure_config.h` (Wi‑Fi + IoT Hub credentials)
+  - `wifi_config.h` (Wi‑Fi + IoT Hub credentials)
 - Open the sketch in Arduino IDE.
-- Edit `azure_config.h` (Wi‑Fi SSID/PASS, IoT Hub host, deviceId, deviceKey).
+- Edit `wifi_config.h` (Wi‑Fi SSID/PASS, IoT Hub host, deviceId, deviceKey).
 - (Google Sheets): ensure your `SHEETS_WEBHOOK_URL` and `SHEETS_TOKEN` are set in the `.ino`.
 - Select the correct board/port and Upload.
 - Open Serial Monitor @ 115200 to observe Wi‑Fi/NTP/MQTT/Publish logs.
@@ -137,7 +137,7 @@ Main tuning points in `rtos_stopwatch_iothub.ino`:
 - Google Sheets webhook:
   - `SHEETS_WEBHOOK_URL`, `SHEETS_TOKEN` (search for these constants)
 
-`azure_config.h`:
+`wifi_config.h`:
 ```c
 #define WIFI_SSID      "YOUR_WIFI_SSID"
 #define WIFI_PASSWORD  "YOUR_WIFI_PASSWORD"
