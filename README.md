@@ -3,8 +3,15 @@
 
 ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑color LEDs, and push button. Built with FreeRTOS (tasks, queues, mutexes, ISR). Each completed “job” (timing run) is published to Google Sheets in near real time.
 
-Demo‑friendly: plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
+Plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
 
+
+| <p align="center"><img src="/images/initial_state.jpg"/><br/>Initial State</p> | <p align="center"><img src="/images/running_state.jpg"/><br/>Running State</p> |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+
+
+| <p align="center"><img src="/images/pause_state.jpg"/><br/>Pause State</p> | <p align="center"><img src="/images/pause_state_by_push_button.jpg"/><br/>Pause State Interrupt by Push Button</p> |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 
 ---
 
