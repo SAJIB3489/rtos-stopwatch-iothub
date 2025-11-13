@@ -35,7 +35,6 @@
 
 #include "wifi_config.h"
 
-// Add these webhook constants near your other #define constants (e.g., after the Azure config section)
 #include <HTTPClient.h> 
 const char* SHEETS_WEBHOOK_URL = "Web_App_URL"; // replace with your Web App URL
 const char* SHEETS_TOKEN       = "SHEETS_TOKEN"; // must match EXPECTED_TOKEN in Apps Script 
@@ -736,7 +735,6 @@ static bool mqttPublishTelemetry(const Telemetry& t) {
 }
 
 
-// Place this function after your helper functions (e.g., after iso8601(...) or mqttPublishTelemetry(...))
 
 // Sends one job entry to the Google Apps Script Web App (Sheets). Blocking HTTP POST.
 bool sendJobToSheet(uint32_t jobNumber, const String& startIso, const String& endIso, uint32_t durationMs) {
