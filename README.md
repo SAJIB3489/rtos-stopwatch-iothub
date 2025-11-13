@@ -6,10 +6,6 @@ ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑col
 Demo‑friendly: plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
 
 
-
-
-
-
 ---
 
 ## 0. Prerequisite
