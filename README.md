@@ -91,7 +91,7 @@ Electrical notes:
 
 ## 4. RTOS Architecture and core task and synchronization
 Core tasks (priorities in parentheses; higher = higher priority):
-- Manager (3): State machine (READY → RUNNING → PAUSED). Consumes events from `eventQueue`. Starts/stops stopwatch, controls long PAUSED hold, queues Azure telemetry (and sends to Sheets if enabled).
+- Manager (3): State machine (READY → RUNNING → PAUSED). Consumes events from `eventQueue`. Starts/stops stopwatch, controls long PAUSED hold, queues sends to Sheets.
 - Stopwatch (2): Increments elapsed milliseconds when running using `vTaskDelayUntil(1 ms)`. Protected by `stopwatchMutex`.
 - Azure (2): Ensures Wi‑Fi, NTP, MQTT SAS auth, and publishes telemetry from `azureQueue`.
 - Ultrasonic (1): Samples distance ~20 Hz, applies hysteresis + consecutive‑sample debounce, emits `EV_OBJ_NEAR` on debounced far→near edges.
