@@ -319,13 +319,3 @@ Performance/Robustness
 - Consider replacing `client.setInsecure()` with proper CA pinning for public demos.
 
 ---
-
-## File structure (reference)
-- `rtos_stopwatch_iothub.ino` — main FreeRTOS firmware with Azure MQTT and optional Google Sheets send
-- `azure_config.h` — Wi‑Fi and IoT Hub credentials and settings
-- `azure_root_ca.h` — Root CA certificate(s) for IoT Hub TLS
-
----
-
-## License
-Demo/educational use. Review licenses for third‑party libraries (Adafruit GFX/SSD1306, PubSubClient).
