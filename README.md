@@ -127,7 +127,16 @@ State machine (simplified):
 
 ---
 
-## 5. How to use (clone the project)
+## 5. How to use this project
+
+**Clone the project**
+
+```
+https://github.com/SAJIB3489/rtos-stopwatch-iothub.git
+```
+
+
+git clone 
 - Place these files in an Arduino sketch folder named like the main `.ino` (e.g., `rtos_stopwatch_iothub`):
   - `rtos_stopwatch_iothub.ino` (main firmware)
   - `azure_config.h` (Wi‑Fi + IoT Hub credentials)
