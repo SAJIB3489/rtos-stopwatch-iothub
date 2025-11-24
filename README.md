@@ -6,15 +6,15 @@ ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑col
 Plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
 
 
-| <p align="center"><img src="/images/initial_state.jpg" style="width:300px; height:200px;"/><br/>Initial State</p> | <p align="center"><img src="/images/running_state.jpg" style="width:300px; height:200px;"/><br/>Running State</p> |
+| <p align="center"><img src="/images/initial_state.jpg" style="width:350px; height:250px;"/><br/>Initial State</p> | <p align="center"><img src="/images/running_state.jpg" style="width:350px; height:250px;"/><br/>Running State</p> |
 | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 
-| <p align="center"><img src="/images/pause_state.jpg" style="width:300px; height:200px;"/><br/>Pause State</p> | <p align="center"><img src="/images/pause_state_by_push_button.jpg" style="width:300px; height:200px;"/><br/>Pause State Interrupt by Push Button</p> |
+| <p align="center"><img src="/images/pause_state.jpg" style="width:350px; height:205px;"/><br/>Pause State</p> | <p align="center"><img src="/images/pause_state_by_push_button.jpg" style="width:350px; height:250px;"/><br/>Pause State Interrupt by Push Button</p> |
 | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
 
-| <p align="center"><img src="/images/google_sheet_data.png" style="width:300px; height:200px;"/><br/>Real-Time Data Store</p> |
-| --------------------------------------------------------------------------------------------------------------------------- |
 
+| <p align="center"><img src="/images/google_sheet_data.png"/><br/>Real-Time Data Store</p> |
+| ------------------------------------------------------------------------------------- | 
 
 
 Video
