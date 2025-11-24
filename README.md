@@ -1,10 +1,16 @@
 # RTOS Stopwatch System / RTOS Timer System
 
-
 ESP32‑S3 stopwatch with ultrasonic start/stop trigger, SSD1306 OLED, tri‑color LEDs, and push button. Built with FreeRTOS (tasks, queues, mutexes, ISR). Each completed “job” (timing run) is published to Azure IoT Hub and optionally appended to Google Sheets in near real time.
 
 Plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
 
+
+
+**Video**
+
+https://github.com/user-attachments/assets/348b11ab-e361-4c2c-843f-c8441c5d8198
+
+**Images**
 
 | <p align="center"><img src="/images/initial_state.jpg"/><br/>Initial State</p> | <p align="center"><img src="/images/running_state.jpg"/><br/>Running State</p> |
 | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -13,48 +19,55 @@ Plug in, watch the OLED and LEDs, see events, and rows appear in a spreadsheet.
 | <p align="center"><img src="/images/pause_state.jpg"/><br/>Pause State</p> | <p align="center"><img src="/images/pause_state_by_push_button.jpg"/><br/>Pause State Interrupt by Push Button</p> |
 | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 
+#### Google Sheets Webhook Configuration
+
 | <p align="center"><img src="/images/google_sheet_data.png"/><br/>Real-Time Data Store</p> |
 | ------------------------------------------------------------------------------------- | 
 
+1. **Setup Tips:**
+   - Create a Google Sheet with a header row: `jobNumber | startTime | endTime | durationMs | insertedAt`.
+   - Ensure the correct `SHEETS_WEBHOOK_URL` and `SHEETS_TOKEN` are updated in your firmware.
 
-Video
+2. **Testing:**
+   - Test your webhook from the firmware to ensure it can write to the Sheet:
+     ```bash
+     curl -X POST "WEB_APP_URL?token=YOUR_SECRET" \
+     -H "Content-Type: application/json" \
+     -d '{"jobNumber":1,"startTime":"2025-11-11T21:05:51Z","endTime":"2025-11-11T21:06:32Z","durationMs":41436}'
+     ```
+   - Check the Apps Script Console logs for errors if no rows are added.
 
-https://github.com/user-attachments/assets/348b11ab-e361-4c2c-843f-c8441c5d8198
+3. **Deployment Notes:**
+   - Avoid committing `SHEETS_TOKEN` directly to public repositories. Use environment variables or secure handling methods in production.
+   - Anonymous public access is only recommended for demo purposes. Use restricted access for production via OAuth2 in Apps Script.
+
+---
+
 
 
 
 ---
 
-## 0. Prerequisite
-- Hardware
-  - ESP32‑S3 development board (3.3 V logic)
-  - HC‑SR04 (or compatible) ultrasonic distance sensor
-  - SSD1306 128×64 I2C OLED
-  - 3x LEDs (RED, YELLOW, GREEN) + 3 resistors (~220–1kΩ)
-  - 1x momentary push button
-  - Breadboard and jumper wires
-  - Optional: 5V→3.3V level shifting for ultrasonic ECHO (if sensor is 5V)
-- Software
-  - Arduino IDE 2.x (or PlatformIO) with ESP32 board support
-  - Libraries: Adafruit SSD1306, Adafruit GFX, PubSubClient
-  - Azure CLI (for monitoring): `az extension add -n azure-iot`
-  - curl (for quick Google Apps Script test)
-- Accounts/Cloud
-  - Azure subscription + IoT Hub
-  - Google account (Google Sheets + Apps Script)
+## 1. Prerequisites and Hardware List
+### Required Hardware
+- 1x ESP32‑S3 development board (3.3 V logic)
+- 1x Ultrasonic distance sensor (HC‑SR04 or compatible)
+- 1x SSD1306 128×64 I2C OLED
+- 3 LEDs (RED, YELLOW, GREEN) + Resistors (220–1kΩ)
+- 1x Momentary push button
+- Breadboard and jumper wires
+- Optional: Level shifter or resistor divider for ultrasonic ECHO (5V→3.3V)
+
+### Required Software
+- Arduino IDE 2.x or PlatformIO with ESP32 board support
+- Libraries:
+  - Adafruit SSD1306
+  - Adafruit GFX
+  - PubSubClient
+- Azure CLI for monitoring (`az extension add -n azure-iot`)
+- curl for testing Google Apps Script integration
 
 ---
-
-## 1. Hardware list
-- ESP32‑S3 dev board
-- Ultrasonic sensor (HC‑SR04)
-- SSD1306 OLED 128×64, I2C
-- LEDs: RED, YELLOW, GREEN
-- Resistors: 3 × 220–1kΩ for LEDs
-- Push button
-- Optional: 2 resistors for ECHO level divider (e.g., 1 kΩ + 2 kΩ) or level shifter
-- USB cable
-
 ---
 
 ## 2. Hardware connection
@@ -105,26 +118,30 @@ Electrical notes:
 ---
 
 ## 4. RTOS Architecture and core task and synchronization
-Core tasks (priorities in parentheses; higher = higher priority):
-- Manager (3): State machine (READY → RUNNING → PAUSED). Consumes events from `eventQueue`. Starts/stops stopwatch, controls long PAUSED hold, queues Azure telemetry (and sends to Sheets if enabled).
-- Stopwatch (2): Increments elapsed milliseconds when running using `vTaskDelayUntil(1 ms)`. Protected by `stopwatchMutex`.
-- Azure (2): Ensures Wi‑Fi, NTP, MQTT SAS auth, and publishes telemetry from `azureQueue`.
-- Ultrasonic (1): Samples distance ~20 Hz, applies hysteresis + consecutive‑sample debounce, emits `EV_OBJ_NEAR` on debounced far→near edges.
-- Display (1): Renders state + HH:MM:SS to OLED.
-- LED (1): Drives tri‑color LEDs; YELLOW blinks on 100 ms buckets aligned with stopwatch ms.
 
-Synchronization and data flow:
-- `eventQueue`: Carries `EV_OBJ_NEAR` (ultrasonic) and `EV_BUTTON` (ISR) to Manager.
-- `azureQueue`: Manager enqueues telemetry on RUNNING→PAUSED; Azure task publishes over MQTT/TLS.
-- `stopwatchMutex`: Protects shared stopwatch struct (`ms`, `running`).
-- Button ISR: Debounced in ISR using RTOS ticks; posts `EV_BUTTON` to `eventQueue`.
-- Ultrasonic debounce: Requires N consecutive “near” or “far” samples to change debounced state; only far→near raises event to avoid spam.
+#### RTOS Core Tasks
+The firmware implements the following RTOS tasks, each with a designated priority:
 
-State machine (simplified):
-- READY: GREEN ON, timer 00:00:00. On EV_OBJ_NEAR → RUNNING.
-- RUNNING: Start stopwatch, GREEN OFF, YELLOW blinks. On EV_OBJ_NEAR or EV_BUTTON → PAUSED (capture start/end/duration, queue telemetry).
-- PAUSED: RED ON, hold for `PAUSE_HOLD_MS` (config), then reset stopwatch and return to READY.
+1. **Manager (Priority: 3)**:
+   - Handles state transitions (READY → RUNNING → PAUSED).
+   - Publishes telemetry to Azure IoT and Google Sheets during PAUSED state.
 
+2. **Stopwatch (Priority: 2)**:
+   - Runs and updates elapsed time while the device is in the RUNNING state.
+
+3. **Azure MQTT Integration (Priority: 2)**:
+   - Handles Wi-Fi, MQTT/TLS connections, and telemetry publishing to Azure IoT Hub.
+
+4. **Ultrasonic Sampling (Priority: 1):**
+   - Debounces ultrasonic distance sensor inputs and triggers relevant state events.
+
+5. **LED Display (Priority: 1):**
+   - Updates LED indicators in real-time as per the current state and timing buckets.
+
+6. **OLED Display (Priority: 1):**
+   - Updates the SSD1306 OLED screen with current stopwatch readings.
+
+---
 ---
 
 ## 5. How to use this project
